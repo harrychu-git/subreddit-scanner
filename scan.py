@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys, getopt, requests, os
+# Run `pip3 install python-dotenv`
 from dotenv import load_dotenv
 
 def printSyntax():
