@@ -15,14 +15,13 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"s:t:",["subreddit=","text="])
 	except getopt.GetoptError:
+		print("Unexpected argument.")
 		printSyntax()
-		print('b')
-		sys.exit(2)
+		sys.exit()
 	
 	for opt, arg in opts:
 		if opt != '-s' and opt != '-t':
 			printSyntax()
-			print('c')
 			sys.exit()
 		elif opt in ("-s", "--subreddit"):
 			subreddit = arg
