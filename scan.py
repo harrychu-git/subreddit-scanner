@@ -37,6 +37,11 @@ def main(argv):
 		elif opt in ("-t", "--text"):
 			text = arg
 
+	url = 'https://oauth.reddit.com/r/' + subreddit + '/new.json?limit=20'
+	print('Username is: ', username)
+	print('URL is: ', url)
+	print('Text is: ', text)
+
 	### Set up reddit API authentication ###
 	load_dotenv()
 	CLIENT_ID = os.getenv("CLIENT_ID")
@@ -48,16 +53,14 @@ def main(argv):
 	TOKEN = res.json()['access_token']
 	headers = {**headers, **{'Authorization': f"bearer {TOKEN}"}}
 
-	#curl -X GET -L url
-	url = 'https://oauth.reddit.com/r/' + subreddit + '/new.json?limit=20'
-	
-	print('Username is: ', username)
-	print('URL is: ', url)
-	print('Text is: ', text)
-
 	requests.get('https://oauth.reddit.com/api/v1/me', headers=headers)
 	res = requests.get(url, headers=headers)
-	print(res.json())
+
+	### JSON PARSER ###	
+	for post in res.json()['data']['children']:
+		print(post['data']['title'])
+		if text.lower() in post['data']['title'].lower():
+			print("Match found: ", text.lower(), " (Implement some notifier)")
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
