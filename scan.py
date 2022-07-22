@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import sys, getopt, requests, os
+import sys, getopt, requests, os, time
 # Run `pip3 install python-dotenv`
 from dotenv import load_dotenv
 
@@ -49,18 +49,26 @@ def main(argv):
 	auth = requests.auth.HTTPBasicAuth(CLIENT_ID, SECRET_TOKEN) 
 	data = {'grant_type': 'password','username': username,'password': password}
 	headers = {'User-Agent': 'scanner/0.0.1'}
-	res = requests.post('https://www.reddit.com/api/v1/access_token', auth=auth, data=data, headers=headers)
-	TOKEN = res.json()['access_token']
-	headers = {**headers, **{'Authorization': f"bearer {TOKEN}"}}
+	isMatch = False;	
 
-	requests.get('https://oauth.reddit.com/api/v1/me', headers=headers)
-	res = requests.get(url, headers=headers)
+	### MAIN LOOP ###
+	while not isMatch:
+		res = requests.post('https://www.reddit.com/api/v1/access_token', auth=auth, data=data, headers=headers)
+		TOKEN = res.json()['access_token']
+		headers = {**headers, **{'Authorization': f"bearer {TOKEN}"}}
 
-	### JSON PARSER ###	
-	for post in res.json()['data']['children']:
-		print(post['data']['title'])
-		if text.lower() in post['data']['title'].lower():
-			print("Match found: ", text.lower(), " (Implement some notifier)")
+		requests.get('https://oauth.reddit.com/api/v1/me', headers=headers)
+		res = requests.get(url, headers=headers)
+
+		### JSON PARSER ###	
+		for post in res.json()['data']['children']:
+			print(post['data']['title'])
+			if text.lower() in post['data']['title'].lower():
+				isMatch = True;
+				print("Match found: ", text.lower(), " (Implement some notifier)")
+		if not isMatch:
+			time.sleep(300)
+	### END LOOP ###
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
